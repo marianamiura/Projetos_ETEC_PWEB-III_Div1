@@ -14,19 +14,8 @@ $login = $data['login'];
 $senha = $data['senha'];
 
 // SQL de inserção
-$sql = "INSERT INTO usuarios (usunome, usulogin, ususenha) 
-        VALUES (:nome, :login, :senha)";
+$sql = "INSERT INTO usuarios (usunome, usulogin, ususenha) VALUES (?, ?,MD5(?));";
 
 $prp = $pdo->prepare($sql);
-
-$prp->bindParam(':nome', $nome);
-$prp->bindParam(':login', $login);
-$prp->bindParam(':senha', $senha);
-
-$prp->execute();
-
-// Retorno em JSON
-echo json_encode([
-    "status" => "logado",
-    "mensagem" => "Usuario inserido com sucesso"
-]);
+$prp->execute(array($nome,$login,$senha));
+Conexao::desconectar();
