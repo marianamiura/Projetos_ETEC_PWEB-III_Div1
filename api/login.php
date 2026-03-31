@@ -5,12 +5,22 @@ $pdo = Conexao::conectar();
 $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 //$json = $_GET['jsn'];
 $json = filter_input(INPUT_GET,'jsn');
-$data = json_decode($json,true);
-$usuario = $data['usuario'];
-$senha = $data['senha'];
-$sql = "select * from usuarios where usulogin = '$usuario' and ususenha = MD5($senha);";
+$data = json_decode($json,true);//{"usuario":"' or '1' = '1'; -- ","senha":""}
+$usuario = $data['usuario'];//' OR '1'='1'
+$senha = $data['senha'];//
+//"select * from usuarios where usulogin = '' OR '1'='1'; -- and ususenha = MD5();"
+$sql = "
+select 
+usuid as id, 
+usunome as nome, 
+usulogin as usuario, 
+usulogado as logado 
+from usuarios 
+where usulogin = ? 
+and ususenha = MD5(?);
+";
 $prp = $pdo->prepare($sql);
-$prp->execute();
+$prp->execute([$usuario,$senha]);
 $data = $prp->fetchall(PDO::FETCH_ASSOC);
 echo json_encode($data);
 Conexao::desconectar();
